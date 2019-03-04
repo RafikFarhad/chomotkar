@@ -1,11 +1,12 @@
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
-#include "include/curl/curl.h"
+#include <curl/curl.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef unsigned long uint64_t;
 typedef struct
@@ -16,6 +17,7 @@ typedef struct
     FILE *dbg_stream;
     uint64_t dnld_file_sz;
 } dnld_params_t;
+
 
 static int get_oname_from_cd(char const *const cd, char *oname)
 {
@@ -109,10 +111,12 @@ size_t dnld_header_parse(void *hdr, size_t size, size_t nmemb, void *userdata)
 
 FILE *get_dnld_stream(char const *const fname)
 {
-    char const *const pre = "./";
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    char const *const pre = getenv("HOME");
     char out[4096];
 
-    snprintf(out, sizeof(out), "%s/%s", pre, fname);
+    snprintf(out, sizeof(out), "%s/chomotkar/image_file_%d_%d_%d_%d_%d_%d.jpeg", pre,  tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
     FILE *fp = fopen(out, "wb");
     if (!fp)
@@ -148,6 +152,7 @@ size_t write_cb(void *buffer, size_t sz, size_t nmemb, void *userdata)
 
 int download_url(char const *const url)
 {
+    printf("Downloading File ...\n");
     CURL *curl;
     int ret = -1;
     CURLcode cerr = CURLE_OK;

@@ -1,0 +1,15 @@
+Source: chomotkar
+Section: utils
+Priority: high
+Maintainer: rafikfarhad <rafikfarhad@gmail.com>
+Build-Depends: libcurl4-openssl-dev, debhelper (>= 10)
+Standards-Version: 1.0.0
+Homepage: chomotkar.rafikfarhad.me
+Vcs-Git: https://github.com/RafikFarhad/chomotkar.git
+
+Package: chomotkar
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Chomotkar is utilty for
+ Debian like PC's . It is soul purpose is to
+ ease the user to change desktop wallpaper.
