@@ -1,7 +1,7 @@
-chomotkar (0.10) bionic; urgency=high
+chomotkar (0.13) bionic; urgency=high
 
-  * Version Upgrade
-  * New try.
-  * Basic Command Test.
+  * Basic Functionality Done
+  * Image Saved On ~/.chomotkar
+  * No Flag Support Yet
 
- -- rafikfarhad <rafikfarhad@gmail.com>  Mon, 04 Mar 2019 09:26:00 +0600
+ -- rafikfarhad <rafikfarhad@gmail.com>  Mon, 10 Mar 2019 01:41:00 +0600

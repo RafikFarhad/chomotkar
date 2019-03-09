@@ -9,6 +9,8 @@
 #include <time.h>
 
 typedef unsigned long uint64_t;
+
+int LOADER = 0;
 typedef struct
 {
     char dnld_remote_fname[4096];
@@ -17,7 +19,6 @@ typedef struct
     FILE *dbg_stream;
     uint64_t dnld_file_sz;
 } dnld_params_t;
-
 
 static int get_oname_from_cd(char const *const cd, char *oname)
 {
@@ -85,43 +86,15 @@ size_t dnld_header_parse(void *hdr, size_t size, size_t nmemb, void *userdata)
     const char *hdr_str = hdr;
     dnld_params_t *dnld_params = (dnld_params_t *)userdata;
     char const *const cdtag = "Content-disposition:";
-
-    /* Example: 
-     * ...
-     * Content-Type: text/html
-     * Content-Disposition: filename=name1367; charset=funny; option=strange
-     */
-    if (strstr(hdr_str, "Content-disposition:"))
-    {
-        printf("has c-d: %s\n", hdr_str);
-    }
-
-    if (!strncasecmp(hdr_str, cdtag, strlen(cdtag)))
-    {
-        printf("Found c-d: %s\n", hdr_str);
-        int ret = get_oname_from_cd(hdr_str + strlen(cdtag), dnld_params->dnld_remote_fname);
-        if (ret)
-        {
-            printf("ERR: bad remote name");
-        }
-    }
-
     return cb;
 }
 
 FILE *get_dnld_stream(char const *const fname)
 {
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    char const *const pre = getenv("HOME");
-    char out[4096];
-
-    snprintf(out, sizeof(out), "%s/chomotkar/image_file_%d_%d_%d_%d_%d_%d.jpeg", pre,  tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-
-    FILE *fp = fopen(out, "wb");
+    FILE *fp = fopen(fname, "wb");
     if (!fp)
     {
-        printf("Could not create file %s\n", out);
+        printf("Could not create file %s\n", fname);
     }
 
     return fp;
@@ -132,11 +105,11 @@ size_t write_cb(void *buffer, size_t sz, size_t nmemb, void *userdata)
     int ret = 0;
     dnld_params_t *dnld_params = (dnld_params_t *)userdata;
 
-    if (!dnld_params->dnld_remote_fname[0])
+    if (LOADER%5==0)
     {
-        ret = get_oname_from_url(dnld_params->dnld_url, dnld_params->dnld_remote_fname);
+        printf(".");
     }
-
+    LOADER++;
     if (!dnld_params->dnld_stream)
     {
         dnld_params->dnld_stream = get_dnld_stream(dnld_params->dnld_remote_fname);
@@ -150,16 +123,26 @@ size_t write_cb(void *buffer, size_t sz, size_t nmemb, void *userdata)
     return ret;
 }
 
-int download_url(char const *const url)
+int download_url(char const *const url, char *fileName)
 {
-    printf("Downloading File ...\n");
+    printf("Downloading Wallpaper ...\n");
     CURL *curl;
     int ret = -1;
+    LOADER = 0;
     CURLcode cerr = CURLE_OK;
     dnld_params_t dnld_params;
 
     memset(&dnld_params, 0, sizeof(dnld_params));
     strncpy(dnld_params.dnld_url, url, strlen(url));
+
+    char *fileNameLocal = dnld_params.dnld_remote_fname;
+    while (*fileName != '\0')
+    {
+        *fileNameLocal = *fileName;
+        fileName++;
+        fileNameLocal++;
+    }
+    fileNameLocal = '\0';
 
     curl = curl_easy_init();
     if (!curl)
@@ -175,6 +158,11 @@ int download_url(char const *const url)
     }
 
     cerr = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    if (cerr)
+    {
+        printf("%s: failed with err %d\n", "FOLLOW LOCATION", cerr);
+        goto bail;
+    }
 
     cerr = curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, dnld_header_parse);
     if (cerr)
@@ -209,15 +197,13 @@ int download_url(char const *const url)
     {
         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(cerr));
     }
-
-    printf("Remote name: %s\n", dnld_params.dnld_remote_fname);
     fclose(dnld_params.dnld_stream);
 
     /* always cleanup */
     curl_easy_cleanup(curl);
-    ret = 0;
-    printf("file size : %lu\n", dnld_params.dnld_file_sz);
-
-bail:
+    ret = dnld_params.dnld_file_sz;
+    printf("\n");
     return ret;
+bail:
+    return -1;
 }
