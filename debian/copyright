@@ -1,14 +1,13 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: chomotkar
-Source: <url://example.com>
+Source: chomotkar.rafikfarhad.me
 
 Files: *
-Copyright: <years> <put author's name and email here>
-           <years> <likewise for another author>
+Copyright: 2019 Rafik Farhad<rafikfarhad@gmail.com>
 License: MIT
 
 Files: debian/*
-Copyright: 2019 Farhad <rafikfarhad@gmail.com>
+Copyright: 2019 Rafik Farhad <rafikfarhad@gmail.com>
 License: MIT
 
 License: MIT

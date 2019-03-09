@@ -24,3 +24,4 @@ int main()
 
 
 // gcc -o chomotkar main.c downloadHelper.c -lcurl && ./chomotkar
+// http://simmesimme.github.io/lessons/2011/11/02/ppa-launchpad-cmake

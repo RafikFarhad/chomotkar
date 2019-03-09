@@ -1,5 +1,7 @@
-chomotkar (0.8) bionic; urgency=high
+chomotkar (0.10) bionic; urgency=high
 
-  * Urgency Fixed.
+  * Version Upgrade
+  * New try.
+  * Basic Command Test.
 
  -- rafikfarhad <rafikfarhad@gmail.com>  Mon, 04 Mar 2019 09:26:00 +0600
